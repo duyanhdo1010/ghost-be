@@ -69,8 +69,10 @@ class Handler extends ExceptionHandler
         $this->renderable(function (Throwable $e, Request $request) {
             if ($request->wantsJson()) {
                 if ($e instanceof ResourceNotFoundException) {
-                    return $this->createErrorResponse('Resource not found!', Response::HTTP_NOT_FOUND);
+                    $message = $e->getMessage() ?? 'Resource not found!';
+                    return $this->createErrorResponse($message, Response::HTTP_NOT_FOUND);
                 }
+
                 if ($e instanceof ValidationException) {
                     return $this->createErrorResponse(
                         'Validation failed',
@@ -78,7 +80,13 @@ class Handler extends ExceptionHandler
                         $e->errors()
                     );
                 }
-                return $this->createErrorResponse('Internal server error!', Response::HTTP_INTERNAL_SERVER_ERROR);
+
+                if ($e instanceof ResourceCanNotCreateException) {
+                    $message = $e->getMessage() ?? 'Resource not found!';
+                    return $this->createErrorResponse($message, Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+                return $this->createErrorResponse($e->getMessage() ?? 'Internal server error!',
+                    Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         });
     }
