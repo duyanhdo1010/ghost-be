@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Product\CreateRequest;
 use App\Http\Requests\Product\SlugRequest;
 use App\Models\Product;
 use App\Services\ProductService;
@@ -29,5 +30,12 @@ class ProductController extends Controller
         $validatedData = $request->validated();
         $product = $this->productService->getProductBySlug($validatedData['slug']);
         return $this->success('Product fetched successfully', $product);
+    }
+
+    public function store(CreateRequest $request)
+    {
+        $validatedData = $request->validated();
+        $newProduct = $this->productService->createProduct($validatedData);
+        return $this->success('Product created successfully', $newProduct);
     }
 }

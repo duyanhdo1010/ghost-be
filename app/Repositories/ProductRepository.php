@@ -24,4 +24,9 @@ class ProductRepository
     {
         return $this->model->where('slug', $slug)->first();
     }
+
+    public function createProduct($data)
+    {
+        return $this->model->create($data);
+    }
 }
