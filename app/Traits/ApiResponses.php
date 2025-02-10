@@ -20,4 +20,14 @@ trait ApiResponses
 
         return response()->json($response, $statusCode);
     }
+
+    protected function respondWithToken($token, $status = Response::HTTP_OK)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => auth()->user()
+        ], $status);
+    }
 }
