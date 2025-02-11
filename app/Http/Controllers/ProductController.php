@@ -38,6 +38,11 @@ class ProductController extends Controller
     public function store(CreateRequest $request)
     {
         $validatedData = $request->validated();
+
+        if ($request->user()->cannot('create', Product::class)) {
+            return $this->errorResponse('You do not have permission to create product');
+        }
+
         $newProduct = $this->productService->createProduct($validatedData);
         return $this->success('Product created successfully', $newProduct);
     }
@@ -45,6 +50,11 @@ class ProductController extends Controller
     public function update(UpdateRequest $request)
     {
         $validatedData = $request->validated();
+
+        if ($request->user()->cannot('update', Product::class)) {
+            return $this->errorResponse('You do not have permission to update product');
+        }
+
         $editedProduct = $this->productService->updateProduct($validatedData);
         return $this->success('Product updated successfully', $editedProduct);
     }
@@ -52,6 +62,11 @@ class ProductController extends Controller
     public function destroy(DeleteRequest $request)
     {
         $validatedSlug = $request->validated();
+
+        if ($request->user()->cannot('delete', Product::class)) {
+            return $this->errorResponse('You do not have permission to delete product');
+        }
+
         $this->productService->deleteProduct($validatedSlug['slug']);
         return $this->success('Product deleted successfully', null, Response::HTTP_NO_CONTENT);
     }
