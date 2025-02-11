@@ -50,7 +50,6 @@ class ProductService
 
     public function createProduct($data)
     {
-        DB::beginTransaction();
 //            create product and create slug for product
         $newProductData = [
             'name'        => $data['name'],
@@ -62,6 +61,8 @@ class ProductService
         ];
 
         try {
+            DB::beginTransaction();
+
             $newProduct = $this->productRepository->createProduct($newProductData);
 
             if (!$newProduct) {
@@ -81,18 +82,18 @@ class ProductService
 
     public function updateProduct($data)
     {
-        DB::beginTransaction();
-        try {
-            $product = $this->productRepository->findById($data['id']);
+        $product = $this->productRepository->findById($data['id']);
 
-            $updateData = [
-                'name'        => $data['name'] ?? $product->name,
-                'description' => $data['description'] ?? $product->description,
-                'price'       => $data['price'] ?? $product->price,
-                'stock'       => $data['stock'] ?? $product->stock,
-                'category_id' => $data['category_id'] ?? $product->category_id,
-                'slug'        => isset($data['name']) ? Str::slug($data['name']) : $product->slug,
-            ];
+        $updateData = [
+            'name'        => $data['name'] ?? $product->name,
+            'description' => $data['description'] ?? $product->description,
+            'price'       => $data['price'] ?? $product->price,
+            'stock'       => $data['stock'] ?? $product->stock,
+            'category_id' => $data['category_id'] ?? $product->category_id,
+            'slug'        => isset($data['name']) ? Str::slug($data['name']) : $product->slug,
+        ];
+        try {
+            DB::beginTransaction();
 
             $updatedProduct = $this->productRepository->updateProduct($product, $updateData);
             if (!$updatedProduct) {
@@ -118,9 +119,9 @@ class ProductService
 
     public function deleteProduct($slug)
     {
-        DB::beginTransaction();
+        $product = $this->getProductBySlug($slug);
         try {
-            $product = $this->getProductBySlug($slug);
+            DB::beginTransaction();
             $this->productRepository->deleteProductBySlug($product);
             DB::commit();
         } catch (\Exception $e) {

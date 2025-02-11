@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
+use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -85,6 +86,11 @@ class Handler extends ExceptionHandler
                     $message = $e->getMessage() ?? 'Resource not found!';
                     return $this->createErrorResponse($message, Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
+
+                if ($e instanceof UnauthorizedException) {
+                    return $this->createErrorResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
+                }
+
                 return $this->createErrorResponse($e->getMessage() ?? 'Internal server error!',
                     Response::HTTP_INTERNAL_SERVER_ERROR);
             }
